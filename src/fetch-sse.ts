@@ -24,6 +24,22 @@ export async function fetchSSE(
       onMessage(event.data)
     }
   })
+  
+  let isFirstChunk = false;
+  function checkFirstChunk(str) {
+    if (!isFirstChunk) {
+      isFirstChunk = true;
+      let json = null;
+      try {
+        json = JSON.parse(str);
+      } catch (err) {
+        // empty
+      }
+      if (json) {
+        throw json;
+      }
+    }
+  }
 
   if (!res.body.getReader) {
     // Vercel polyfills `fetch` with `node-fetch`, which doesn't conform to
@@ -43,6 +59,7 @@ export async function fetchSSE(
   } else {
     for await (const chunk of streamAsyncIterable(res.body)) {
       const str = new TextDecoder().decode(chunk)
+      checkFirstChunk(str);
       parser.feed(str)
     }
   }
