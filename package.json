@@ -32,7 +32,7 @@
     "pretest": "run-s build",
     "docs": "typedoc",
     "prepare": "husky install",
-    "pre-commit-bak": "lint-staged",
+    "pre-commit": "lint-staged",
     "test": "run-p test:*",
     "test:prettier": "prettier '**/*.{js,jsx,ts,tsx}' --check"
   },
