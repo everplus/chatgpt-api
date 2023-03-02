@@ -1,7 +1,7 @@
 {
-  "name": "chatgpt",
-  "version": "5.0.4",
-  "description": "Node.js client for the official ChatGPT API.",
+  "name": "@evertech/chatgpt-patched",
+  "version": "5.0.4-patched.0",
+  "description": "Node.js client for the unofficial ChatGPT API.",
   "author": "Travis Fischer <travis@transitivebullsh.it>",
   "repository": "transitive-bullshit/chatgpt-api",
   "license": "MIT",

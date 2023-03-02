@@ -33,24 +33,32 @@ export async function fetchSSE(
     }
   })
 
-  if (!res.body.getReader) {
-    // Vercel polyfills `fetch` with `node-fetch`, which doesn't conform to
-    // web standards, so this is a workaround...
-    const body: NodeJS.ReadableStream = res.body as any
-
-    if (!body.on || !body.read) {
-      throw new types.ChatGPTError('unsupported "fetch" implementation')
-    }
-
-    body.on('readable', () => {
-      let chunk: string | Buffer
-      while (null !== (chunk = body.read())) {
-        parser.feed(chunk.toString())
+  let isFirstChunk = false
+  function checkFirstChunk(str) {
+    if (!isFirstChunk) {
+      isFirstChunk = true
+      let json = null
+      try {
+        json = JSON.parse(str)
+      } catch (err) {
+        // empty
       }
-    })
+      if (json) {
+        throw json
+      }
+    }
+  }
+
+  if (!res.body.getReader) {
+    for await (const chunk of res.body as any) {
+      const str = chunk.toString()
+      checkFirstChunk(str)
+      parser.feed(str)
+    }
   } else {
     for await (const chunk of streamAsyncIterable(res.body)) {
       const str = new TextDecoder().decode(chunk)
+      checkFirstChunk(str)
       parser.feed(str)
     }
   }
